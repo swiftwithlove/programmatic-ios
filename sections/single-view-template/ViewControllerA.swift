@@ -29,7 +29,7 @@ class ViewControllerA: UIViewController {
     }
     
     func setupNavigationBar() {
-        title = "Screen A"
+        title = "Todos"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(showScreenB))
         navigationController?.navigationBar.style()
     }
@@ -95,7 +95,7 @@ extension ViewControllerA: UITableViewDelegate {
 
 extension ViewControllerA: ViewControllerBDelegate {
     
-    func didPressSave(section: TableSection, string: String) {
+    func didPressSave(section: TableSection, item: TableSectionItem) {
         
         // Grab the values (the array at the section we care about)
         guard var values = tableViewDataSource.data[section.rawValue] else {
@@ -103,7 +103,7 @@ extension ViewControllerA: ViewControllerBDelegate {
         }
         
         // insert the string into the values array
-        values.append(string)
+        values.append(item)
         
         // replace the array that is being pointed to by that key.
         tableViewDataSource.data[section.rawValue] = values

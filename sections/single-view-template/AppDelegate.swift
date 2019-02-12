@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func setup() {
         setupWindow()
+        setupStatusBar()
     }
     
     func setupWindow() {
@@ -30,6 +31,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         )
             
         window?.makeKeyAndVisible()
+    }
+    
+    func setupStatusBar() {
+        UIApplication.shared.statusBarStyle = .lightContent
     }
 }
 

@@ -15,9 +15,9 @@ enum TableSection: Int {
 class ViewControllerTableDataSource: NSObject {
     
     var data = [
-        TableSection.top.rawValue : ["Test"],
-        TableSection.middle.rawValue : ["Test"],
-        TableSection.bottom.rawValue : ["Test"]
+        TableSection.top.rawValue : [TableSectionItem](),
+        TableSection.middle.rawValue : [TableSectionItem](),
+        TableSection.bottom.rawValue : [TableSectionItem]()
     ]
 }
 
@@ -43,15 +43,16 @@ extension ViewControllerTableDataSource: UITableViewDataSource {
         
         let k = Array(data.keys.sorted())[indexPath.section]
         if let v = data[k] {
-            cell.customTitleLabel.text = v[indexPath.row]
+            let item = v[indexPath.row]
+            cell.customTitleLabel.text = item.string
+            cell.customImageView.image = item.image
         }
         // Assign the value to the labels text.
         cell.customSubtitleLabel.text = "Detail text"
-        cell.customImageView.image = UIImage(named: "image")
         return cell
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return String(Array(data.keys.sorted())[section])
+        return sectionTitle(index: Array(data.keys.sorted())[section])
     }
 }

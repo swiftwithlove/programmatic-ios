@@ -9,11 +9,13 @@
 import UIKit
 
 protocol ViewControllerBDelegate: class {
-    func didPressSave(section: TableSection, string: String)
+    func didPressSave(section: TableSection, item: TableSectionItem)
 }
 
 private struct Constants {
-    static let fontSize: CGFloat = 36.0
+    static let fontSize: CGFloat = 14.0
+    static let padding: CGFloat = 20.0
+    static let dimension: CGFloat = 40.0
 }
 
 class ViewControllerB: UIViewController {
@@ -24,6 +26,7 @@ class ViewControllerB: UIViewController {
     
     let segment = UISegmentedControl()
     let dataTextField = UITextField()
+    let imageButton = UIButton()
     
     // MARK: - Lifecycle
     
@@ -44,10 +47,11 @@ class ViewControllerB: UIViewController {
         setupTextField()
         setupSegmentedControl()
         setupNavigationBar()
+        setupImageButton()
     }
     
     func setupView() {
-        view.backgroundColor = UIColor.lightGray
+        view.backgroundColor = UIColor.white
     }
     
     func setupTextField() {
@@ -55,11 +59,14 @@ class ViewControllerB: UIViewController {
         dataTextField.font = UIFont.boldSystemFont(ofSize: Constants.fontSize)
         dataTextField.placeholder = "Enter text..."
         dataTextField.becomeFirstResponder()
+        
+        dataTextField.layer.borderWidth = 1
+        dataTextField.layer.borderColor = UIColor.blue.cgColor
         view.addSubview(dataTextField)
     }
     
     func setupNavigationBar() {
-        title = "Screen B"
+        title = "Create todo"
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Save",
             style: .plain,
@@ -72,34 +79,55 @@ class ViewControllerB: UIViewController {
     
     func setupSegmentedControl() {
         segment.insertSegment(
-            withTitle: String(TableSection.top.rawValue),
+            withTitle: sectionTitle(index: TableSection.top.rawValue),
             at: TableSection.top.rawValue,
             animated: false
         )
         segment.insertSegment(
-            withTitle: String(TableSection.middle.rawValue),
+            withTitle: sectionTitle(index: TableSection.middle.rawValue),
             at: TableSection.middle.rawValue,
             animated: false
         )
         segment.insertSegment(
-            withTitle: String(TableSection.bottom.rawValue),
+            withTitle: sectionTitle(index: TableSection.bottom.rawValue),
             at: TableSection.bottom.rawValue,
             animated: false
         )
+    }
+    
+    func setupImageButton() {
+        imageButton.setImage(UIImage(named: "camera"), for: .normal)
+        imageButton.addTarget(self, action: #selector(openPhotoLibrary), for: UIControl.Event.touchUpInside)
+        view.addSubview(imageButton)
     }
     
     // MARK: - Layout
     
     func layout() {
         layoutTextField()
+        layoutImageButton()
     }
     
     func layoutTextField() {
+        
+        guard let nMaxY = navigationController?.navigationBar.frame.maxY else {
+            return
+        }
+        
         dataTextField.frame = CGRect(
-            x: (view.bounds.size.width / 2) - 100,
-            y: 160,
+            x: Constants.padding,
+            y: nMaxY + Constants.padding,
             width: 200,
-            height: 40
+            height: Constants.dimension
+        )
+    }
+    
+    func layoutImageButton() {
+        imageButton.frame = CGRect(
+            x: dataTextField.frame.maxX + Constants.padding,
+            y: dataTextField.frame.minY,
+            width: Constants.dimension,
+            height: Constants.dimension
         )
     }
     
@@ -109,12 +137,36 @@ class ViewControllerB: UIViewController {
         
         guard
             let s = dataTextField.text,
-            let t = TableSection(rawValue: segment.selectedSegmentIndex)
+            let t = TableSection(rawValue: segment.selectedSegmentIndex),
+            let imageView = imageButton.imageView,
+            let image = imageView.image
         else {
             return
         }
         
-        delegate?.didPressSave(section: t, string: s)
+        let i = TableSectionItem(image: image, string: s)
+        delegate?.didPressSave(section: t, item: i)
         navigationController?.popViewController(animated: true)
+    }
+    
+    @objc func openPhotoLibrary() {
+        let vc = UIImagePickerController()
+        vc.delegate = self
+        present(vc, animated: true, completion: nil)
+    }
+}
+
+extension ViewControllerB: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        picker.dismiss(animated: true, completion: nil)
+        
+        guard let image = info[.originalImage] as? UIImage else {
+            print("No selected image")
+            return
+        }
+        
+        imageButton.setImage(image, for: .normal)
     }
 }

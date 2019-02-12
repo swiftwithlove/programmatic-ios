@@ -17,3 +17,16 @@ extension UINavigationBar {
         largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
     }
 }
+
+extension NSObject {
+    
+    func sectionTitle(index: Int) -> String {
+        switch index {
+        case 0: return "High"
+        case 1: return "Medium"
+        case 2: return "Low"
+        default:
+            return ""
+        }
+    }
+}
